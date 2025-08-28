@@ -44,7 +44,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className={`${inter.variable} ${poppins.variable}`}>
-      <body className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-50 flex flex-col min-h-screen overflow-x-hidden">
+      <body className="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-50 flex flex-col min-h-screen overflow-x-hidden">
         <Navbar />
         <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-16">
           {children}
