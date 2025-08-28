@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const poppins = Poppins({ subsets: ["latin"], weight: ["400", "600", "700"], variable: "--font-poppins" });
 
 export const metadata: Metadata = {
+  metadataBase: process.env.NODE_ENV === 'development' 
+    ? new URL('http://localhost:3000') 
+    : new URL('https://www.deskblue.com.br'),
   title: "DeskBlue - Simplificando tecnologia para você",
   description: "Dicas práticas de tecnologia, conteúdo acessível e soluções rápidas para problemas digitais cotidianos.",
   openGraph: {
@@ -17,7 +20,7 @@ export const metadata: Metadata = {
     siteName: "DeskBlue",
     images: [
       {
-        url: "https://www.deskblue.com.br/images/og-image.jpg", // Placeholder, replace with actual OG image
+        url: "/images/og-image.svg",
         width: 1200,
         height: 630,
         alt: "DeskBlue - Simplificando tecnologia",
@@ -30,7 +33,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "DeskBlue - Simplificando tecnologia para você",
     description: "Dicas práticas de tecnologia, conteúdo acessível e soluções rápidas para problemas digitais cotidianos.",
-    images: ["https://www.deskblue.com.br/images/og-image.jpg"], // Placeholder, replace with actual Twitter image
+    images: ["/images/og-image.svg"],
   },
 };
 
