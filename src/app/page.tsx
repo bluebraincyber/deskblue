@@ -1,6 +1,7 @@
 import { getPublishedPosts } from "@/lib/notion";
 import PostCard from "@/components/PostCard";
 import Link from "next/link";
+import Image from "next/image";
 
 export default async function Home() {
   const posts = await getPublishedPosts();
@@ -9,6 +10,18 @@ export default async function Home() {
   return (
     <div className="w-full">
       <section className="text-center py-12 sm:py-20 px-4">
+        <div className="flex justify-center mb-6">
+          <Link href="/" className="block">
+            <Image
+              src="/logo.png"
+              alt="DeskBlue Logo"
+              width={120}
+              height={120}
+              className="w-24 h-24 sm:w-32 sm:h-32 rounded-full cursor-pointer hover:scale-105 transition-transform duration-200"
+              priority
+            />
+          </Link>
+        </div>
         <h1 className="text-4xl sm:text-5xl font-bold text-blue-600 dark:text-blue-400 font-poppins">DeskBlue</h1>
         <p className="text-lg sm:text-xl text-gray-700 dark:text-gray-300 mt-4 font-inter">Simplificando tecnologia para você</p>
         <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
