@@ -1,4 +1,4 @@
-import { posts } from "@/data/mocks/posts";
+import { getPostBySlug } from "@/lib/notion";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,8 +10,8 @@ interface PostPageProps {
   params: { slug: string };
 }
 
-export default function PostPage({ params }: PostPageProps) {
-  const post = posts.find((p) => p.slug === params.slug);
+export default async function PostPage({ params }: PostPageProps) {
+  const post = await getPostBySlug(params.slug);
 
   if (!post) {
     notFound();
@@ -33,7 +33,7 @@ export default function PostPage({ params }: PostPageProps) {
       <nav className="text-sm text-gray-500 dark:text-gray-400 mb-4">
         <Link href="/" className="hover:underline">Home</Link>
         <span className="mx-2">/</span>
-        <Link href={`/${post.type.toLowerCase()}s`} className="hover:underline">{post.type === "Tip" ? "Tips" : "Future"}</Link>
+        <Link href={`/${post.type === "Tip" ? "tips" : "future"}`} className="hover:underline">{post.type === "Tip" ? "Dicas" : "Futuro"}</Link>
         <span className="mx-2">/</span>
         <span>{post.title}</span>
       </nav>
@@ -106,6 +106,8 @@ export default function PostPage({ params }: PostPageProps) {
 
 
 export async function generateStaticParams() {
+  const { getPublishedPosts } = await import("@/lib/notion");
+  const posts = await getPublishedPosts();
   return posts.map((post) => ({
     slug: post.slug,
   }));

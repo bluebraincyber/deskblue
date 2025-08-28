@@ -1,8 +1,9 @@
-import { posts } from "@/data/mocks/posts";
+import { getPublishedPosts } from "@/lib/notion";
 import PostCard from "@/components/PostCard";
 import Link from "next/link";
 
-export default function Home() {
+export default async function Home() {
+  const posts = await getPublishedPosts();
   const latestPosts = posts.slice(0, 4);
 
   return (
@@ -23,7 +24,7 @@ export default function Home() {
       <section className="py-12">
         <h2 className="text-3xl font-bold text-center mb-8 font-poppins">Últimas Dicas e Artigos</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {latestPosts.map((post) => (
+          {latestPosts.map((post: any) => (
             <PostCard key={post.id} post={post} />
           ))}
         </div>

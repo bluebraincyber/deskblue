@@ -12,22 +12,22 @@ const Footer = () => {
             Home
           </Link>
           <Link href="/tips" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-            Tips
+            Dicas
           </Link>
           <Link href="/future" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-            Future
+            Futuro
           </Link>
           <Link href="/about" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-            About
+            Sobre
           </Link>
           <Link href="/contact" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-            Contact
+            Contato
           </Link>
           <Link href="/privacy" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-            Privacy
+            Privacidade
           </Link>
           <Link href="/terms" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-            Terms
+            Termos
           </Link>
         </nav>
         <div className="flex justify-center space-x-6 mb-4 text-2xl">

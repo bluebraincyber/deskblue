@@ -40,16 +40,16 @@ const Navbar = () => {
         </Link>
         <div className="hidden md:flex space-x-6 items-center">
           <Link href="/tips" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-            Tips
+            Dicas
           </Link>
           <Link href="/future" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-            Future
+            Futuro
           </Link>
           <Link href="/about" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-            About
+            Sobre
           </Link>
           <Link href="/contact" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-            Contact
+            Contato
           </Link>
           <button className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
             🔍

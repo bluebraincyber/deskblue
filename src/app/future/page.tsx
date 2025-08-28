@@ -1,8 +1,9 @@
-import { posts } from "@/data/mocks/posts";
+import { getPublishedPosts } from "@/lib/notion";
 import PostCard from "@/components/PostCard";
 
-export default function FuturePage() {
-  const futurePosts = posts.filter(post => post.type === "Future");
+export default async function FuturePage() {
+  const posts = await getPublishedPosts();
+  const futurePosts = posts.filter((post: any) => post.type === "Future");
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -16,7 +17,7 @@ export default function FuturePage() {
       </section>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
-        {futurePosts.map((post) => (
+        {futurePosts.map((post: any) => (
           <PostCard key={post.id} post={post} />
         ))}
       </div>
