@@ -1,16 +1,9 @@
-import Image from "next/image";
-
 export default function AboutPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <section className="text-center py-12 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md">
-        <div className="relative w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden">
-          <Image
-            src="/images/profile-placeholder.png" // Placeholder image
-            alt="Foto de Perfil DeskBlue"
-            fill
-            style={{ objectFit: 'cover' }}
-          />
+        <div className="relative w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+          <span className="text-4xl text-gray-500 dark:text-gray-400">👨‍💻</span>
         </div>
         <h1 className="text-4xl font-bold text-blue-600 dark:text-blue-400 font-poppins mb-2">
           Sobre o DeskBlue

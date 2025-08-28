@@ -6,16 +6,22 @@ interface ShareButtonProps {
 
 export default function ShareButton({ url }: ShareButtonProps) {
   const shareOnWhatsApp = () => {
-    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(url)}`, '_blank');
+    if (typeof window !== 'undefined') {
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(url)}`, '_blank');
+    }
   };
 
   const shareOnTelegram = () => {
-    window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}`, '_blank');
+    if (typeof window !== 'undefined') {
+      window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}`, '_blank');
+    }
   };
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(url);
-    // Opcional: adicionar feedback visual como um toast
+    if (typeof window !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(url);
+      // Opcional: adicionar feedback visual como um toast
+    }
   };
 
   return (

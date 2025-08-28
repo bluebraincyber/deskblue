@@ -36,7 +36,7 @@ export default function TermsPage() {
           Reservamo-nos o direito de modificar estes Termos de Uso a qualquer momento. As alterações entrarão em vigor imediatamente após a publicação no site. Seu uso contínuo do site após as alterações constitui sua aceitação dos novos termos.
         </p>
         <p>
-          Última atualização: 27 de agosto de 2025.
+          Última atualização: 27 de dezembro de 2024.
         </p>
       </div>
     </div>

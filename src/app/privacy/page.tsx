@@ -32,7 +32,7 @@ export default function PrivacyPage() {
           Esta Política de Privacidade pode ser atualizada periodicamente. Recomendamos que você revise esta página regularmente para quaisquer alterações.
         </p>
         <p>
-          Última atualização: 27 de agosto de 2025.
+          Última atualização: 27 de dezembro de 2024.
         </p>
       </div>
     </div>

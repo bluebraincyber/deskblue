@@ -3,15 +3,39 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    domains: [
-      "images.unsplash.com",
-      "images.pexels.com",
-      "s3.us-west-2.amazonaws.com",
-      "s3.amazonaws.com",
-      "prod-files-secure.s3.us-west-2.amazonaws.com",
-      "www.notion.so",
-      "notion.so",
-      "secure.notion-static.com"
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.pexels.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 's3.us-west-2.amazonaws.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 's3.amazonaws.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'prod-files-secure.s3.us-west-2.amazonaws.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.notion.so',
+      },
+      {
+        protocol: 'https',
+        hostname: 'notion.so',
+      },
+      {
+        protocol: 'https',
+        hostname: 'secure.notion-static.com',
+      },
     ],
   },
 };

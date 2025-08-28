@@ -2,7 +2,9 @@ import { Client } from "@notionhq/client";
 import { Post } from "@/types/post";
 import { posts as mockPosts } from "@/data/mocks/posts";
 
-const notion = new Client({ auth: process.env.NOTION_API_KEY });
+const notion = new Client({ 
+  auth: process.env.NOTION_API_KEY || "" 
+});
 const DB_ID = process.env.NOTION_DATABASE_ID;
 
 function isNotionConfigured(): boolean {

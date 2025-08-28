@@ -1,9 +1,10 @@
 import { getPublishedPosts } from "@/lib/notion";
 import PostCard from "@/components/PostCard";
+import { Post } from "@/types/post";
 
 export default async function FuturePage() {
   const posts = await getPublishedPosts();
-  const futurePosts = posts.filter((post: any) => post.type === "Future");
+  const futurePosts = posts.filter((post: Post) => post.type === "Future");
 
   return (
     <div className="w-full">
@@ -17,7 +18,7 @@ export default async function FuturePage() {
       </section>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
-        {futurePosts.map((post: any) => (
+        {futurePosts.map((post: Post) => (
           <PostCard key={post.id} post={post} />
         ))}
       </div>

@@ -1,4 +1,4 @@
-import { getPostBySlug } from "@/lib/notion";
+import { getPublishedPosts, getPostBySlug } from "@/lib/notion";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -76,7 +76,7 @@ export default async function PostPage({ params }: PostPageProps) {
         </div>
       </section>
 
-      <ShareButton url={typeof window !== 'undefined' ? window.location.href : `https://www.deskblue.com.br/post/${post.slug}`} />
+      <ShareButton url={`https://www.deskblue.com.br/post/${post.slug}`} />
 
       {/* Related Posts - Placeholder */}
       {/* <section className="mt-12">
@@ -91,10 +91,8 @@ export default async function PostPage({ params }: PostPageProps) {
   );
 }
 
-
 export async function generateStaticParams() {
   try {
-    const { getPublishedPosts } = await import("@/lib/notion");
     const posts = await getPublishedPosts();
     
     if (!posts || posts.length === 0) {

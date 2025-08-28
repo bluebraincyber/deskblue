@@ -19,7 +19,7 @@ export const generateArticleSchema = (post: Post) => {
       "name": "DeskBlue",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://www.deskblue.com.br/images/deskblue-logo.png" // Replace with actual logo URL
+        "url": "https://www.deskblue.com.br/logo.png" // Replace with actual logo URL
       }
     },
     "mainEntityOfPage": {
@@ -40,8 +40,8 @@ export const generateBreadcrumbSchema = (post: Post) => {
     {
       "@type": "ListItem",
       "position": 2,
-      "name": post.type === "Tip" ? "Tips" : "Future",
-      "item": `https://www.deskblue.com.br/${post.type.toLowerCase()}s`
+      "name": post.type === "Tip" ? "Dicas" : "Futuro",
+      "item": `https://www.deskblue.com.br/${post.type === "Tip" ? "tips" : "future"}`
     },
     {
       "@type": "ListItem",
