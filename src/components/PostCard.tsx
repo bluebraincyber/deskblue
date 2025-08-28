@@ -17,6 +17,12 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
           style={{ objectFit: 'cover' }}
           className="transition-transform duration-300 hover:scale-105"
         />
+        {post.videoUrl && (
+          <div className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+            <span>▶️</span>
+            <span className="hidden sm:inline">Vídeo</span>
+          </div>
+        )}
       </div>
       <div className="p-4 sm:p-6">
         <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">

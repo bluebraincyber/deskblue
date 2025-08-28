@@ -6,17 +6,17 @@ export default async function FuturePage() {
   const futurePosts = posts.filter((post: any) => post.type === "Future");
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <section className="text-center py-12 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md mb-8">
-        <h1 className="text-4xl font-bold text-blue-600 dark:text-blue-400 font-poppins mb-2">
+    <div className="w-full">
+      <section className="text-center py-8 sm:py-12 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md mb-6 sm:mb-8 px-4">
+        <h1 className="text-3xl sm:text-4xl font-bold text-blue-600 dark:text-blue-400 font-poppins mb-2">
           🚀 TECNOLOGIA & FUTURO
         </h1>
-        <p className="text-xl text-gray-700 dark:text-gray-300 font-inter">
+        <p className="text-lg sm:text-xl text-gray-700 dark:text-gray-300 font-inter">
           &ldquo;Reflexões sobre o mundo digital que nos cerca&rdquo;
         </p>
       </section>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
         {futurePosts.map((post: any) => (
           <PostCard key={post.id} post={post} />
         ))}

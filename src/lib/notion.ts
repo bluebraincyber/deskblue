@@ -268,6 +268,15 @@ function convertBlocksToMarkdown(blocks: any[]): string {
         const caption = block.image.caption?.length ? block.image.caption.map((text: any) => text.plain_text).join("") : "";
         markdown += `![${caption}](${imageUrl})\n\n`;
         break;
+      case "bookmark":
+        // Processar bookmarks (links) para detectar vídeos do YouTube
+        const bookmarkUrl = block.bookmark.url;
+        if (bookmarkUrl && isYouTubeUrl(bookmarkUrl)) {
+          markdown += `{{YOUTUBE_EMBED:${bookmarkUrl}}}\n\n`;
+        } else {
+          markdown += `[${block.bookmark.caption?.[0]?.plain_text || "Link"}](${bookmarkUrl})\n\n`;
+        }
+        break;
       default:
         // Para outros tipos de blocos não tratados
         break;
@@ -275,4 +284,15 @@ function convertBlocksToMarkdown(blocks: any[]): string {
   }
   
   return markdown;
+}
+
+// Função para detectar URLs do YouTube
+function isYouTubeUrl(url: string): boolean {
+  const youtubePatterns = [
+    /youtube\.com\/watch\?v=/,
+    /youtu\.be\//,
+    /youtube\.com\/embed\//,
+    /youtube\.com\/v\//
+  ];
+  return youtubePatterns.some(pattern => pattern.test(url));
 }

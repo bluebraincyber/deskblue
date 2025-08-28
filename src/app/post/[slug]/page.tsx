@@ -2,7 +2,7 @@ import { getPostBySlug } from "@/lib/notion";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import ReactMarkdown from "react-markdown";
+import CustomMarkdown from "@/components/CustomMarkdown";
 import { generateArticleSchema, generateBreadcrumbSchema } from "./schema";
 import ShareButton from "@/components/ShareButton";
 
@@ -21,7 +21,7 @@ export default async function PostPage({ params }: PostPageProps) {
   const breadcrumbSchema = generateBreadcrumbSchema(post);
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
@@ -72,20 +72,7 @@ export default async function PostPage({ params }: PostPageProps) {
         </div>
 
         <div className="prose dark:prose-invert max-w-none">
-          {post.videoUrl && (
-            <div className="aspect-video w-full mb-6">
-              <iframe
-                src={`https://www.youtube.com/embed/${post.videoUrl.split("v=")[1]}`}
-                title="YouTube video player"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-                className="w-full h-full rounded-lg"
-              ></iframe>
-            </div>
-          )}
-          <ReactMarkdown>{post.content}</ReactMarkdown>
+          <CustomMarkdown>{post.content}</CustomMarkdown>
         </div>
       </section>
 
@@ -106,11 +93,25 @@ export default async function PostPage({ params }: PostPageProps) {
 
 
 export async function generateStaticParams() {
-  const { getPublishedPosts } = await import("@/lib/notion");
-  const posts = await getPublishedPosts();
-  return posts.map((post) => ({
-    slug: post.slug,
-  }));
+  try {
+    const { getPublishedPosts } = await import("@/lib/notion");
+    const posts = await getPublishedPosts();
+    
+    if (!posts || posts.length === 0) {
+      console.warn("[generateStaticParams] Nenhum post encontrado");
+      return [];
+    }
+    
+    const params = posts.map((post) => ({
+      slug: post.slug,
+    }));
+    
+    console.log(`[generateStaticParams] Gerando ${params.length} rotas estáticas:`, params.map(p => p.slug));
+    return params;
+  } catch (error) {
+    console.error("[generateStaticParams] Erro ao gerar parâmetros estáticos:", error);
+    return [];
+  }
 }
 
 
