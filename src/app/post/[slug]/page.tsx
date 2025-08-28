@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import { generateArticleSchema, generateBreadcrumbSchema } from "./schema";
+import ShareButton from "@/components/ShareButton";
 
 interface PostPageProps {
   params: { slug: string };
@@ -88,26 +89,7 @@ export default function PostPage({ params }: PostPageProps) {
         </div>
       </section>
 
-      <section className="bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md p-6 md:p-8 lg:p-10 text-center">
-        <p className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Gostou da dica? Compartilhe!
-        </p>
-        <div className="flex justify-center space-x-6 text-3xl">
-          <a href="#" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors" aria-label="Compartilhar no WhatsApp">
-            📱
-          </a>
-          <a href="#" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors" aria-label="Compartilhar no Telegram">
-            💬
-          </a>
-          <button
-            onClick={() => navigator.clipboard.writeText(window.location.href)}
-            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            aria-label="Copiar Link"
-          >
-            🔗
-          </button>
-        </div>
-      </section>
+      <ShareButton url={typeof window !== 'undefined' ? window.location.href : `https://www.deskblue.com.br/post/${post.slug}`} />
 
       {/* Related Posts - Placeholder */}
       {/* <section className="mt-12">
