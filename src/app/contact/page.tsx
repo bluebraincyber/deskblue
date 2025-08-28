@@ -1,4 +1,5 @@
-import Link from "next/link";
+// Remove the unused import
+import React from "next/react";
 
 export default function ContactPage() {
   return (
@@ -8,7 +9,7 @@ export default function ContactPage() {
           📞 CONTATO
         </h1>
         <p className="text-xl text-gray-700 dark:text-gray-300 font-inter">
-          "Vamos conversar!"
+          &ldquo;Vamos conversar!&rdquo;
         </p>
       </section>
 
@@ -24,7 +25,7 @@ export default function ContactPage() {
             Chamar no WhatsApp
           </a>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
-            "Respondo pessoalmente em até 2 horas"
+            &ldquo;Respondo pessoalmente em até 2 horas&rdquo;
           </p>
         </div>
 
@@ -39,7 +40,7 @@ export default function ContactPage() {
             Ver no YouTube
           </a>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
-            "Conteúdo visual para aprender melhor"
+            &ldquo;Conteúdo visual para aprender melhor&rdquo;
           </p>
         </div>
 
@@ -54,7 +55,7 @@ export default function ContactPage() {
             Enviar Email
           </a>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
-            "Para parcerias e colaborações"
+            &ldquo;Para parcerias e colaborações&rdquo;
           </p>
         </div>
       </div>

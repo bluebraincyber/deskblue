@@ -16,7 +16,7 @@ export default function AboutPage() {
           Sobre o DeskBlue
         </h1>
         <p className="text-xl text-gray-700 dark:text-gray-300 font-inter">
-          "Transformando complexidade em simplicidade"
+          &ldquo;Transformando complexidade em simplicidade&rdquo;
         </p>
       </section>
 
@@ -53,7 +53,7 @@ export default function AboutPage() {
             </a>
           </div>
           <p className="text-gray-700 dark:text-gray-300 text-center">
-            "Sempre pronto para ajudar com suas dúvidas!"
+            &ldquo;Sempre pronto para ajudar com suas dúvidas!&rdquo;
           </p>
         </div>
       </section>

@@ -11,7 +11,7 @@ export default function FuturePage() {
           🚀 TECNOLOGIA & FUTURO
         </h1>
         <p className="text-xl text-gray-700 dark:text-gray-300 font-inter">
-          "Reflexões sobre o mundo digital que nos cerca"
+          &ldquo;Reflexões sobre o mundo digital que nos cerca&rdquo;
         </p>
       </section>
 
