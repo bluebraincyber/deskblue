@@ -1,6 +1,9 @@
-// Remove the unused import
+// Remover esta linha ou corrigir para:
 import React from "next/react";
 
+// Correto seria:
+import React from "react";
+// Ou simplesmente remover se não estiver usando React explicitamente
 export default function ContactPage() {
   return (
     <div className="container mx-auto px-4 py-8">
