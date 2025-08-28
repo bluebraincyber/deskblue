@@ -33,8 +33,8 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white dark:bg-gray-900 shadow-md fixed w-full z-10">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+    <nav className="bg-white dark:bg-gray-900 shadow-md fixed w-full z-10 top-0 left-0 right-0">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         <Link href="/" className="text-2xl font-bold text-blue-600 dark:text-blue-400">
           DeskBlue
         </Link>
