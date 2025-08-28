@@ -2,9 +2,13 @@
 import Link from 'next/link';
 import { SunIcon, MoonIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { useState, useEffect } from 'react';
+import SearchModal from './SearchModal';
+import { Post } from '@/types/post';
 
 const Navbar = () => {
   const [darkMode, setDarkMode] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -17,6 +21,23 @@ const Navbar = () => {
         document.documentElement.classList.remove('dark');
       }
     }
+  }, []);
+
+  // Carregar posts para a pesquisa
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch('/api/posts');
+        if (response.ok) {
+          const data = await response.json();
+          setPosts(data);
+        }
+      } catch (error) {
+        console.error('Erro ao carregar posts para pesquisa:', error);
+      }
+    };
+
+    fetchPosts();
   }, []);
 
   const toggleDarkMode = () => {
@@ -51,7 +72,10 @@ const Navbar = () => {
           <Link href="/contact" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
             Contato
           </Link>
-          <button className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+          <button 
+            onClick={() => setIsSearchOpen(true)}
+            className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
+          >
             <MagnifyingGlassIcon className="h-5 w-5" />
           </button>
           <button onClick={toggleDarkMode} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
@@ -63,7 +87,10 @@ const Navbar = () => {
           </button>
         </div>
         <div className="md:hidden flex items-center space-x-4">
-          <button className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+          <button 
+            onClick={() => setIsSearchOpen(true)}
+            className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
+          >
             <MagnifyingGlassIcon className="h-5 w-5" />
           </button>
           <button onClick={toggleDarkMode} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
@@ -80,6 +107,13 @@ const Navbar = () => {
           </button>
         </div>
       </div>
+      
+      {/* Modal de Pesquisa */}
+      <SearchModal 
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        posts={posts}
+      />
     </nav>
   );
 };
