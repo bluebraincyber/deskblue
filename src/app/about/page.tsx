@@ -6,7 +6,7 @@ export default function AboutPage() {
       <section className="text-center py-12 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md">
         <div className="relative w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden">
           <Image
-            src="/images/profile-placeholder.jpg" // Placeholder image
+            src="/images/profile-placeholder.png" // Placeholder image
             alt="Foto de Perfil DeskBlue"
             fill
             style={{ objectFit: 'cover' }}
