@@ -25,21 +25,22 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, posts }) => 
   useEffect(() => {
     let filtered = posts;
 
-    // Filtrar por categoria
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(post => 
-        post.tags.some(tag => tag.toLowerCase() === selectedCategory.toLowerCase())
-      );
-    }
-
-    // Filtrar por termo de busca
+    // Se há termo de busca, pesquisar em todos os posts independente da categoria
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(post =>
+      filtered = posts.filter(post =>
         post.title.toLowerCase().includes(term) ||
         post.excerpt.toLowerCase().includes(term) ||
+        post.content.toLowerCase().includes(term) ||
         post.tags.some(tag => tag.toLowerCase().includes(term))
       );
+    } else {
+      // Se não há busca, filtrar apenas por categoria
+      if (selectedCategory !== 'all') {
+        filtered = filtered.filter(post => 
+          post.tags.some(tag => tag.toLowerCase() === selectedCategory.toLowerCase())
+        );
+      }
     }
 
     setFilteredPosts(filtered);

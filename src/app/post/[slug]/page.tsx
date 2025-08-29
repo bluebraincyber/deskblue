@@ -1,10 +1,15 @@
-import { getPublishedPosts, getPostBySlug } from "@/lib/notion";
+import { getAllSlugs, getPostBySlug } from "@/lib/notion";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import CustomMarkdown from "@/components/CustomMarkdown";
 import { generateArticleSchema, generateBreadcrumbSchema } from "./schema";
 import ShareButton from "@/components/ShareButton";
+import type { Metadata } from "next";
+
+// ISR: Revalidar a cada 5 minutos (300 segundos)
+export const revalidate = 300;
+export const dynamicParams = true;
 
 interface PostPageProps {
   params: { slug: string };
@@ -93,22 +98,65 @@ export default async function PostPage({ params }: PostPageProps) {
 
 export async function generateStaticParams() {
   try {
-    const posts = await getPublishedPosts();
+    const slugs = await getAllSlugs();
     
-    if (!posts || posts.length === 0) {
-      console.warn("[generateStaticParams] Nenhum post encontrado");
+    if (!slugs || slugs.length === 0) {
+      console.warn("[generateStaticParams] Nenhum slug encontrado");
       return [];
     }
     
-    const params = posts.map((post) => ({
-      slug: post.slug,
-    }));
+    const params = slugs.map((slug) => ({ slug }));
     
-    console.log(`[generateStaticParams] Gerando ${params.length} rotas estáticas:`, params.map(p => p.slug));
+    console.log(`[generateStaticParams] Gerando ${params.length} rotas estáticas:`, slugs);
     return params;
   } catch (error) {
     console.error("[generateStaticParams] Erro ao gerar parâmetros estáticos:", error);
     return [];
+  }
+}
+
+export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
+  try {
+    const post = await getPostBySlug(params.slug);
+    
+    if (!post) {
+      return {
+        title: "Post não encontrado | DeskBlue",
+        description: "O post solicitado não foi encontrado."
+      };
+    }
+
+    const url = `${process.env.NEXT_PUBLIC_SITE_URL}/post/${post.slug}`;
+    const imageUrl = post.cover || `${process.env.NEXT_PUBLIC_SITE_URL}/api/og?title=${encodeURIComponent(post.title)}`;
+
+    return {
+      title: `${post.title} | DeskBlue`,
+      description: post.excerpt || post.seoDescription,
+      openGraph: {
+        type: "article",
+        url,
+        title: post.title,
+        description: post.excerpt || post.seoDescription,
+        images: [{ url: imageUrl }],
+        publishedTime: post.publishedAt,
+        tags: post.tags
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: post.title,
+        description: post.excerpt || post.seoDescription,
+        images: [imageUrl]
+      },
+      alternates: {
+        canonical: url
+      }
+    };
+  } catch (error) {
+    console.error("Erro ao gerar metadata:", error);
+    return {
+      title: "DeskBlue",
+      description: "Simplificando tecnologia para você"
+    };
   }
 }
 

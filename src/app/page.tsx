@@ -1,12 +1,14 @@
-import { getPublishedPosts } from "@/lib/notion";
+import { getLatestPosts } from "@/lib/notion";
 import PostCard from "@/components/PostCard";
 import Link from "next/link";
 import Image from "next/image";
 import { Post } from "@/types/post";
 
+// ISR: Revalidar a cada 5 minutos (300 segundos)
+export const revalidate = 300;
+
 export default async function Home() {
-  const posts = await getPublishedPosts();
-  const latestPosts = posts.slice(0, 4);
+  const latestPosts = await getLatestPosts(4);
 
   return (
     <div className="w-full">

@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { getPublishedPosts } from '@/lib/notion';
+import { getPublishedPostsWithContent } from '@/lib/notion';
 
 export async function GET() {
   try {
-    const posts = await getPublishedPosts();
+    const posts = await getPublishedPostsWithContent();
     return NextResponse.json(posts);
   } catch (error) {
     console.error('Erro ao buscar posts para API:', error);

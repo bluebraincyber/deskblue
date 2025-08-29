@@ -4,13 +4,13 @@ import { Post } from "@/types/post";
 import { posts as mockPosts } from "@/data/mocks/posts";
 
 const notion = new Client({ 
-  auth: process.env.NOTION_API_KEY || "" 
+  auth: process.env.NOTION_TOKEN || process.env.NOTION_API_KEY || "" 
 });
 const n2m = new NotionToMarkdown({ notionClient: notion });
 const DB_ID = process.env.NOTION_DATABASE_ID;
 
 function isNotionConfigured(): boolean {
-  return Boolean(process.env.NOTION_API_KEY && process.env.NOTION_DATABASE_ID);
+  return Boolean((process.env.NOTION_TOKEN || process.env.NOTION_API_KEY) && process.env.NOTION_DATABASE_ID);
 }
 
 function slugify(text: string): string {
@@ -174,6 +174,58 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
     console.error(`Erro ao buscar post com slug ${slug}:`, error);
     const local = mockPosts.find((p) => p.slug === slug);
     return local ?? null;
+  }
+}
+
+// Função para obter todos os posts publicados com conteúdo completo (para pesquisa)
+export async function getPublishedPostsWithContent(): Promise<Post[]> {
+  try {
+    const posts = await getPublishedPosts();
+    
+    // Se estamos usando mocks, retornar diretamente (já têm conteúdo)
+    const useMocks = String(process.env.USE_MOCKS).toLowerCase() === "true";
+    if (useMocks || !isNotionConfigured()) {
+      return posts;
+    }
+
+    // Carregar conteúdo completo para cada post
+    const postsWithContent = await Promise.all(
+      posts.map(async (post) => {
+        const content = await getPageContent(post.id);
+        return {
+          ...post,
+          content,
+          readingTime: calculateReadingTime(content),
+        };
+      })
+    );
+
+    return postsWithContent;
+  } catch (error) {
+    console.error("Erro ao buscar posts com conteúdo:", error);
+    return mockPosts;
+  }
+}
+
+// Função para obter todos os slugs (necessária para generateStaticParams)
+export async function getAllSlugs(): Promise<string[]> {
+  try {
+    const posts = await getPublishedPosts();
+    return posts.map(post => post.slug);
+  } catch (error) {
+    console.error("Erro ao buscar slugs:", error);
+    return mockPosts.map(post => post.slug);
+  }
+}
+
+// Função para obter posts mais recentes (necessária para ISR na home)
+export async function getLatestPosts(limit: number = 50): Promise<Post[]> {
+  try {
+    const posts = await getPublishedPosts();
+    return posts.slice(0, limit);
+  } catch (error) {
+    console.error("Erro ao buscar posts mais recentes:", error);
+    return mockPosts.slice(0, limit);
   }
 }
 
