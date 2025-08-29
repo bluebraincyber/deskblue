@@ -2,6 +2,9 @@ import { getPublishedPosts } from "@/lib/notion";
 import TipsFilter from "@/components/TipsFilter";
 import { Post } from '@/types/post';
 
+// ISR: Revalidar a cada 1 minuto (60 segundos)
+export const revalidate = 60;
+
 export default async function TipsPage() {
   const allPosts = await getPublishedPosts();
   

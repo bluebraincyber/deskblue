@@ -2,6 +2,9 @@ import { getPublishedPosts } from "@/lib/notion";
 import PostCard from "@/components/PostCard";
 import { Post } from "@/types/post";
 
+// ISR: Revalidar a cada 1 minuto (60 segundos)
+export const revalidate = 60;
+
 export default async function FuturePage() {
   const posts = await getPublishedPosts();
   const futurePosts = posts.filter((post: Post) => post.type === "Future");
