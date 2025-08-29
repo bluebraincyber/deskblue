@@ -7,8 +7,8 @@ import { generateArticleSchema, generateBreadcrumbSchema } from "./schema";
 import ShareButton from "@/components/ShareButton";
 import type { Metadata } from "next";
 
-// ISR: Revalidar a cada 5 minutos (300 segundos)
-export const revalidate = 300;
+// ISR: Revalidar a cada 1 minuto (60 segundos)
+export const revalidate = 60;
 export const dynamicParams = true;
 
 interface PostPageProps {

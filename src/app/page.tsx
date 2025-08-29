@@ -4,8 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { Post } from "@/types/post";
 
-// ISR: Revalidar a cada 5 minutos (300 segundos)
-export const revalidate = 300;
+// ISR: Revalidar a cada 1 minuto (60 segundos)
+export const revalidate = 60;
 
 export default async function Home() {
   const latestPosts = await getLatestPosts(4);
