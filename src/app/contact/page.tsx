@@ -20,7 +20,7 @@ export default function ContactPage() {
           <p className="text-gray-700 dark:text-gray-300 mb-4 text-sm sm:text-base">
             Dúvidas rápidas e suporte direto
           </p>
-          <a href="#" className="bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold hover:bg-blue-700 transition-colors text-sm sm:text-base">
+          <a href="#" className="bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition-colors text-base min-w-[140px] h-12 flex items-center justify-center">
             Chamar no WhatsApp
           </a>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-4">
@@ -35,7 +35,7 @@ export default function ContactPage() {
           <p className="text-gray-700 dark:text-gray-300 mb-4 text-sm sm:text-base">
             Tutoriais em vídeo e reviews
           </p>
-          <a href="#" className="bg-red-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold hover:bg-red-700 transition-colors text-sm sm:text-base">
+          <a href="#" className="bg-red-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-red-700 transition-colors text-base min-w-[140px] h-12 flex items-center justify-center">
             Ver no YouTube
           </a>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-4">
@@ -50,7 +50,7 @@ export default function ContactPage() {
           <p className="text-gray-700 dark:text-gray-300 mb-4 text-sm sm:text-base">
             Contato profissional
           </p>
-          <a href="#" className="bg-gray-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold hover:bg-gray-700 transition-colors text-sm sm:text-base">
+          <a href="#" className="bg-gray-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-gray-700 transition-colors text-base min-w-[140px] h-12 flex items-center justify-center">
             Enviar Email
           </a>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-4">

@@ -1,10 +1,12 @@
 import { Client } from "@notionhq/client";
+import { NotionToMarkdown } from "notion-to-md";
 import { Post } from "@/types/post";
 import { posts as mockPosts } from "@/data/mocks/posts";
 
 const notion = new Client({ 
   auth: process.env.NOTION_API_KEY || "" 
 });
+const n2m = new NotionToMarkdown({ notionClient: notion });
 const DB_ID = process.env.NOTION_DATABASE_ID;
 
 function isNotionConfigured(): boolean {
@@ -22,6 +24,13 @@ function slugify(text: string): string {
     .replace(/(^-|-$)+/g, "");
 }
 
+// Função para calcular tempo de leitura
+function calculateReadingTime(content: string): number {
+  const wordsPerMinute = 200;
+  const words = content.split(/\s+/).length;
+  return Math.ceil(words / wordsPerMinute);
+}
+
 // Função para obter posts publicados
 export async function getPublishedPosts(): Promise<Post[]> {
   try {
@@ -36,69 +45,96 @@ export async function getPublishedPosts(): Promise<Post[]> {
       return mockPosts;
     }
 
-    // Query simples - busca todos os posts e filtra depois
+    // Consulta sem filtro por property (mais robusto a diferenças de schema)
     const res = await notion.databases.query({
       database_id: DB_ID!,
-      sorts: [{ timestamp: "created_time", direction: "descending" }],
+      sorts: [
+        { timestamp: "created_time", direction: "descending" }
+      ],
+      page_size: 100
     });
     console.log(`[Notion] getPublishedPosts: resultados=${res.results?.length ?? 0}`);
 
-    // Filtrar apenas posts publicados e mapear
-    const publishedPosts = res.results.filter((page: any) => {
+    // Filtra Published em memória (lida com nomes diferentes de propriedade)
+    const publishedPages = res.results.filter((page: any) => {
       const p = page.properties;
-      const status = p.status?.select?.name || p.Status?.select?.name || p.State?.select?.name;
-      return status && status.toLowerCase().includes('published');
+      const status =
+        p.status?.select?.name ||
+        p.Status?.select?.name ||
+        p.State?.select?.name;
+      return status && (status.toLowerCase() === "published" || status.toLowerCase().includes("published"));
     });
 
-    console.log(`[Notion] Posts publicados encontrados: ${publishedPosts.length}`);
+    return publishedPages.map((page: any) => {
+      const p = page.properties;
+      
+      // Título
+      const title =
+        p.title?.title?.[0]?.plain_text ||
+        p.Title?.title?.[0]?.plain_text ||
+        p.Name?.title?.[0]?.plain_text ||
+        "";
 
-    return Promise.all(
-      publishedPosts.map(async (page: any) => {
-        const p = page.properties;
-        
-        // Debug: mostrar propriedades disponíveis
-        console.log(`[Notion] Propriedades do post ${page.id}:`, Object.keys(p));
-        
-        const title = p.title?.title?.[0]?.plain_text ?? p.Name?.title?.[0]?.plain_text ?? "Sem título";
-        const routeSlug = p.route?.rich_text?.[0]?.plain_text ?? p.slug?.rich_text?.[0]?.plain_text;
-        const status = p.status?.select?.name || p.Status?.select?.name || p.State?.select?.name || "Draft";
-        const type = p.type?.select?.name || p.Type?.select?.name || "Tip";
-        const tags = (p.categories?.multi_select ?? p.Tags?.multi_select ?? []).map((t: any) => t.name);
-        const publishedAt = p.Published?.date?.start || p.publish?.date?.start || p.Date?.date?.start || new Date().toISOString();
-        const excerpt = p.summary?.rich_text?.[0]?.plain_text || p.excerpt?.rich_text?.[0]?.plain_text || p.description?.rich_text?.[0]?.plain_text || "";
-        
-        // Calcular tempo de leitura (estimativa baseada no número de blocos)
-        const blocks = await getPageBlocks(page.id);
-        const readingTime = Math.max(1, Math.ceil(blocks.length / 15));
-        
-        return {
-          id: page.id,
-          title,
-          slug: routeSlug && routeSlug !== "articles" ? routeSlug : slugify(title),
-          status,
-          type,
-          tags,
-          publishedAt,
-          excerpt,
-          seoTitle: p.seo_title?.rich_text?.[0]?.plain_text ?? title,
-          seoDescription: p.seo_description?.rich_text?.[0]?.plain_text ?? excerpt,
-          cover:
-            p.cover?.files?.[0]?.external?.url ||
-            p.cover?.files?.[0]?.file?.url ||
-            p.coverImage?.files?.[0]?.external?.url ||
-            p.coverImage?.files?.[0]?.file?.url ||
-            p.cover_img?.files?.[0]?.external?.url ||
-            p.cover_img?.files?.[0]?.file?.url ||
-            page.cover?.external?.url ||
-            page.cover?.file?.url ||
-            "",
-          altText: p.alt_text?.rich_text?.[0]?.plain_text ?? "",
-          videoUrl: p.video_url?.url ?? null,
-          readingTime,
-          content: "", // Será preenchido pelo getPostBySlug quando necessário
-        };
-      })
-    );
+      // Slug
+      const customSlug =
+        p.route?.rich_text?.[0]?.plain_text ||
+        p.slug?.rich_text?.[0]?.plain_text;
+      const slug = customSlug || slugify(title);
+
+      // Tipo
+      const type = (p.type?.select?.name ?? p.Type?.select?.name ?? "Tip") as "Tip" | "Future";
+
+      // Tags
+      const tags =
+        p.categories?.multi_select?.map((t: any) => t.name) ??
+        p.tags?.multi_select?.map((t: any) => t.name) ??
+        p.Tags?.multi_select?.map((t: any) => t.name) ??
+        [];
+
+      // Data de publicação
+      const publishedAt =
+        p.Published?.date?.start ||
+        p.published?.date?.start ||
+        p.publishedAt?.date?.start ||
+        (page.created_time ? page.created_time.split("T")[0] : "");
+
+      // Resumo
+      const excerpt =
+        p.summary?.rich_text?.[0]?.plain_text ||
+        p.excerpt?.rich_text?.[0]?.plain_text ||
+        p.description?.rich_text?.[0]?.plain_text ||
+        "";
+
+      // Evitar baixar conteúdo completo aqui (performance).
+      // Estimativa simples baseada no resumo (fallback para 3 min).
+      const estimatedReadingTime = excerpt
+        ? Math.max(1, Math.ceil(excerpt.split(/\s+/).length / 120))
+        : 3;
+
+      return {
+        id: page.id,
+        title,
+        slug,
+        status: "Published" as const,
+        type,
+        tags,
+        publishedAt,
+        excerpt,
+        seoTitle: p.seo_title?.rich_text?.[0]?.plain_text ?? title,
+        seoDescription: p.seo_description?.rich_text?.[0]?.plain_text ?? excerpt,
+        cover:
+          p.cover?.files?.[0]?.external?.url ||
+          p.cover?.files?.[0]?.file?.url ||
+          p.coverImage?.files?.[0]?.external?.url ||
+          p.coverImage?.files?.[0]?.file?.url ||
+          (page.cover?.external?.url || page.cover?.file?.url) ||
+          "",
+        altText: p.alt_text?.rich_text?.[0]?.plain_text ?? "",
+        videoUrl: p.video_url?.url ?? null,
+        readingTime: estimatedReadingTime,
+        content: "", // conteúdo completo só no getPostBySlug
+      };
+    });
   } catch (error) {
     console.error("Erro ao buscar posts do Notion:", error);
     console.error("[Notion] Erro na query -> servindo posts mockados");
@@ -118,183 +154,37 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
       return local ?? null;
     }
 
-    // Buscar todos os posts publicados e encontrar o que corresponde ao slug
-    const all = await notion.databases.query({
-      database_id: DB_ID!,
-      sorts: [{ timestamp: "created_time", direction: "descending" }],
-    });
-
-    // Filtrar posts publicados e encontrar o que corresponde ao slug
-    const publishedPosts = all.results.filter((page: any) => {
-      const p = page.properties;
-      const status = p.status?.select?.name || p.Status?.select?.name || p.State?.select?.name;
-      return status && status.toLowerCase().includes('published');
-    });
-
-    console.log(`[Notion] getPostBySlug: buscando slug=${slug} em ${publishedPosts.length} posts publicados`);
-
-    // Encontrar o post que corresponde ao slug
-    const match = publishedPosts.find((page: any) => {
-      const p = page.properties;
-      const title = p.title?.title?.[0]?.plain_text ?? "";
-      const routeSlug = p.route?.rich_text?.[0]?.plain_text ?? p.slug?.rich_text?.[0]?.plain_text;
-      const generatedSlug = routeSlug && routeSlug !== "articles" ? routeSlug : slugify(title);
-      
-      console.log(`[Notion] Comparando: "${generatedSlug}" com "${slug}"`);
-      return generatedSlug === slug;
-    });
-
-    if (!match) {
-      console.log(`[Notion] getPostBySlug: nenhum resultado para slug=${slug}`);
+    // Buscar todos os posts publicados e localizar o slug
+    const posts = await getPublishedPosts();
+    const post = posts.find((p) => p.slug === slug);
+    if (!post) {
+      console.log(`[Notion] Post com slug '${slug}' não encontrado`);
       return null;
     }
 
-    const res = { results: [match] } as any;
+    // Baixa conteúdo completo e recalcula readingTime
+    const content = await getPageContent(post.id);
 
-    if (!res.results.length) {
-      console.log(`[Notion] getPostBySlug: nenhum resultado para slug=${slug}`);
-      return null;
-    }
-
-    const page: any = res.results[0];
-    const p = page.properties;
-    
-    // Obter o conteúdo da página
-    const content = await getPageContent(page.id);
-    
-    // Calcular tempo de leitura (estimativa baseada no conteúdo)
-    const wordCount = content.split(/\s+/).length;
-    const readingTime = Math.max(1, Math.ceil(wordCount / 200)); // Média de 200 palavras por minuto
-    
-    const title = p.title?.title?.[0]?.plain_text ?? "Sem título";
     return {
-      id: page.id,
-      title,
-      slug,
-      status: p.status?.select?.name ?? "Draft",
-      type: p.type?.select?.name ?? "Tip",
-      tags: (p.categories?.multi_select ?? []).map((t: any) => t.name),
-      publishedAt: p.Published?.date?.start || p.publish?.date?.start || new Date().toISOString(),
-      excerpt: p.summary?.rich_text?.[0]?.plain_text ?? "",
-      seoTitle: p.seo_title?.rich_text?.[0]?.plain_text ?? p.title?.title?.[0]?.plain_text ?? "Sem título",
-      seoDescription: p.seo_description?.rich_text?.[0]?.plain_text ?? p.summary?.rich_text?.[0]?.plain_text ?? "",
-      cover:
-        p.cover?.files?.[0]?.external?.url ||
-        p.cover?.files?.[0]?.file?.url ||
-        p.coverImage?.files?.[0]?.external?.url ||
-        p.coverImage?.files?.[0]?.file?.url ||
-        p.cover_img?.files?.[0]?.external?.url ||
-        p.cover_img?.files?.[0]?.file?.url ||
-        page.cover?.external?.url ||
-        page.cover?.file?.url ||
-        "",
-      altText: p.alt_text?.rich_text?.[0]?.plain_text ?? "",
-      videoUrl: p.video_url?.url ?? null,
-      readingTime,
+      ...post,
       content,
+      readingTime: calculateReadingTime(content),
     };
   } catch (error) {
     console.error(`Erro ao buscar post com slug ${slug}:`, error);
-    // Fallback em caso de erro
     const local = mockPosts.find((p) => p.slug === slug);
     return local ?? null;
-  }
-}
-
-// Função para obter os blocos de uma página
-async function getPageBlocks(pageId: string): Promise<any[]> {
-  try {
-    const { results } = await notion.blocks.children.list({
-      block_id: pageId,
-    });
-    return results;
-  } catch (error) {
-    console.error(`Erro ao buscar blocos da página ${pageId}:`, error);
-    return [];
   }
 }
 
 // Função para obter o conteúdo de uma página e converter para Markdown
 async function getPageContent(pageId: string): Promise<string> {
   try {
-    const blocks = await getPageBlocks(pageId);
-    return convertBlocksToMarkdown(blocks);
+    const mdblocks = await n2m.pageToMarkdown(pageId);
+    const mdString = n2m.toMarkdownString(mdblocks);
+    return mdString.parent || "";
   } catch (error) {
     console.error(`Erro ao obter conteúdo da página ${pageId}:`, error);
     return "";
   }
-}
-
-// Função para converter blocos do Notion para Markdown
-function convertBlocksToMarkdown(blocks: any[]): string {
-  let markdown = "";
-  
-  for (const block of blocks) {
-    switch (block.type) {
-      case "paragraph":
-        markdown += block.paragraph.rich_text.map((text: any) => text.plain_text).join("") + "\n\n";
-        break;
-      case "heading_1":
-        markdown += "# " + block.heading_1.rich_text.map((text: any) => text.plain_text).join("") + "\n\n";
-        break;
-      case "heading_2":
-        markdown += "## " + block.heading_2.rich_text.map((text: any) => text.plain_text).join("") + "\n\n";
-        break;
-      case "heading_3":
-        markdown += "### " + block.heading_3.rich_text.map((text: any) => text.plain_text).join("") + "\n\n";
-        break;
-      case "bulleted_list_item":
-        markdown += "- " + block.bulleted_list_item.rich_text.map((text: any) => text.plain_text).join("") + "\n";
-        break;
-      case "numbered_list_item":
-        markdown += "1. " + block.numbered_list_item.rich_text.map((text: any) => text.plain_text).join("") + "\n";
-        break;
-      case "to_do":
-        const checked = block.to_do.checked ? "[x]" : "[ ]";
-        markdown += `- ${checked} ` + block.to_do.rich_text.map((text: any) => text.plain_text).join("") + "\n";
-        break;
-      case "toggle":
-        markdown += block.toggle.rich_text.map((text: any) => text.plain_text).join("") + "\n\n";
-        break;
-      case "code":
-        markdown += "```" + (block.code.language || "") + "\n" + block.code.rich_text.map((text: any) => text.plain_text).join("") + "\n```\n\n";
-        break;
-      case "quote":
-        markdown += "> " + block.quote.rich_text.map((text: any) => text.plain_text).join("") + "\n\n";
-        break;
-      case "divider":
-        markdown += "---\n\n";
-        break;
-      case "image":
-        const imageUrl = block.image.type === "external" ? block.image.external.url : block.image.file.url;
-        const caption = block.image.caption?.length ? block.image.caption.map((text: any) => text.plain_text).join("") : "";
-        markdown += `![${caption}](${imageUrl})\n\n`;
-        break;
-      case "bookmark":
-        // Processar bookmarks (links) para detectar vídeos do YouTube
-        const bookmarkUrl = block.bookmark.url;
-        if (bookmarkUrl && isYouTubeUrl(bookmarkUrl)) {
-          markdown += `{{YOUTUBE_EMBED:${bookmarkUrl}}}\n\n`;
-        } else {
-          markdown += `[${block.bookmark.caption?.[0]?.plain_text || "Link"}](${bookmarkUrl})\n\n`;
-        }
-        break;
-      default:
-        // Para outros tipos de blocos não tratados
-        break;
-    }
-  }
-  
-  return markdown;
-}
-
-// Função para detectar URLs do YouTube
-function isYouTubeUrl(url: string): boolean {
-  const youtubePatterns = [
-    /youtube\.com\/watch\?v=/,
-    /youtu\.be\//,
-    /youtube\.com\/embed\//,
-    /youtube\.com\/v\//
-  ];
-  return youtubePatterns.some(pattern => pattern.test(url));
 }

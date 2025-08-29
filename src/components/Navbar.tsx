@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { SunIcon, MoonIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import SearchModal from './SearchModal';
 import { Post } from '@/types/post';
 
@@ -10,6 +10,7 @@ const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -40,6 +41,25 @@ const Navbar = () => {
 
     fetchPosts();
   }, []);
+
+  // Fechar menu mobile ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    if (isMobileMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [isMobileMenuOpen]);
 
   const toggleDarkMode = () => {
     if (typeof window !== 'undefined') {
@@ -114,7 +134,7 @@ const Navbar = () => {
       
       {/* Menu Mobile */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg">
+        <div ref={mobileMenuRef} className="md:hidden bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg">
           <div className="px-4 py-4 space-y-3">
             <Link 
               href="/tips" 
