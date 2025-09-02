@@ -36,6 +36,18 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'secure.notion-static.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'imgbb.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.ibb.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'ibb.co',
+      },
     ],
   },
 };
